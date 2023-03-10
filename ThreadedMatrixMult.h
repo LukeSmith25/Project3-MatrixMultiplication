@@ -25,12 +25,22 @@ struct SquareMatrix{
 
 void * BruteForceSquareMatrixMultiplication(void *);
 
+void setMatrix(SquareMatrix* A,int* array) {
+    for (int i = 0; i < A->dim; i++) {
+        for(int j = 0; j < A->dim; j++) {
+            // Take Int Array and Populate Matrix Data
+        }
+    }
+}
+
 static void displayMatrix(SquareMatrix* matrix) {
+    cout << matrix->dim << endl;
     for (int i = 0; i < matrix->dim; i++) {
         // For Size of Col B
         for (int j = 0; j < matrix->dim; j++) {
-
+            cout << matrix->data[i][j] << " ";
         }
+        cout << endl;
     }
 }
 
@@ -42,7 +52,7 @@ static void displayMatrix(SquareMatrix* matrix) {
 //                                                           *
 //************************************************************
 SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
-    SquareMatrix* result = new SquareMatrix(A.dim);
+    auto* result = new SquareMatrix(A.dim);
     result->dim = A.dim;
     // For Size of Row A
     for (int i = 0; i < A.dim; i++) {

@@ -13,18 +13,25 @@
 using namespace std;
 
 int main() {
-    SquareMatrix matrixA = *new SquareMatrix(3);
-    SquareMatrix matrixB = *new SquareMatrix(3);
-    int matrixA[3][3] = {10, 10, 20, 4, 5, 6, 2, 3, 5};
-    int matrixB[3][3] = {3, 2, 4, 3, 3, 9, 4, 4, 2};
+    // Read In Dimensions of Matrices
+    int dim1, dim2;
+    cin >> dim1 >> dim2;
 
-    auto* A = new SquareMatrix(3);
-    auto* B = new SquareMatrix(3);
-    A->data = reinterpret_cast<int **>((matrixA));
-    B->data = (int**)(matrixB);
+    // Declare Two Matrices
+    SquareMatrix matrixA = *new SquareMatrix(dim1);
+    SquareMatrix matrixB = *new SquareMatrix(dim2);
 
-    displayMatrix(A);
-    displayMatrix(B);
+    // Read in Matrices
+    int input;
+    for (int i = 0; i < dim1; i++) {
+        for (int j = 0; j < dim1; j++) {
+            cin >> input;
+            matrixA.*data[i][j] = input;
+        }
+    }
+
+    //displayMatrix(matrixA);
+    //displayMatrix(matrixB);
 
     return 0;
 }

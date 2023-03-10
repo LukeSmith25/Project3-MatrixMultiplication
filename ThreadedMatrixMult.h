@@ -12,6 +12,7 @@
 #define PROJECT3_MATRIXMULTIPLICATION_THREADEDMATRIXMULT_H
 
 #include <iostream>
+#include <unordered_map>
 using namespace std;
 
 struct SquareMatrix{
@@ -68,5 +69,45 @@ SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
 
     return result;
 }
+
+
+SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix& B) {
+    /*
+     * S1 = (A11 + A22) * (B11 + B22)
+     * S2 = (A21 + A22) *  B11
+     * S3 = A11 * (B12 – B22)
+     * S4 = A22 * (B21 – B11)
+     * S5 = (A11 + A12) * B22
+     * S6 = (A21 – A11) * (B11 + B12)
+     * S7 = (A12 – A22) * (B21 + B22)
+     */
+
+    unordered_map<string,int> matrixMap;
+
+    // Store Matrix A
+    for (int i = 0; i < A.dim; i++) {
+        for (int j = 0; j < B.dim; j++) {
+            string element = "A";
+            element += (i+1);
+            element += (j+1);
+            matrixMap.emplace(element, A.data[i][j]);
+            cout << "STORING: " << element << " " << A.data << endl;
+        }
+    }
+
+    // Store Matrix B
+    for (int i = 0; i < A.dim; i++) {
+        for (int j = 0; j < B.dim; j++) {
+            string element = "B";
+            element += (i+1);
+            element += (j+1);
+            matrixMap.emplace(element, B.data[i][j]);
+            cout << "STORING: " << element << " " << B.data << endl;
+        }
+    }
+
+    int S1, S2, S3, S4, S5, S6, S7;
+}
+
 
 #endif //PROJECT3_MATRIXMULTIPLICATION_THREADEDMATRIXMULT_H

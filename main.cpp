@@ -20,7 +20,8 @@ int main() {
     // Declare Two Matrices
     SquareMatrix matrixA = SquareMatrix(dim1);
     matrixA.displayMatrix();
-    SquareMatrix matrixB = *new SquareMatrix(dim2);
+    SquareMatrix matrixB = SquareMatrix(dim2);
+    matrixB.displayMatrix();
 
     // Read in Matrices
     int input;

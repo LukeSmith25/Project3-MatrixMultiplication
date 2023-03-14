@@ -1,0 +1,27 @@
+# ninja log v5
+0	394	7001875139076018	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+395	582	7001875140909419	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+3	246	7001877376902041	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+246	326	7001877377655616	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+2	278	7001878482630220	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+278	347	7001878483279635	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+3	253	7001883535844724	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+254	329	7001883536568495	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+3	304	7001883718048919	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+312	389	7001883718864352	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+2	283	7001883823045582	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+283	360	7001883823795300	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+2	367	7001940317590042	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+367	472	7001940318635992	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+2	434	7005258285846639	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+434	612	7005258287575229	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+2	339	7005274969364642	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+339	459	7005274970545518	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+3	342	7005276034009863	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+342	410	7005276034672232	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+2	330	7005276194536315	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+330	406	7005276195281142	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+3	335	7005277047996241	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+336	445	7005277049071541	Project3_MatrixMultiplication.exe	ebe1a4571aeef803
+2	328	7005279373196139	CMakeFiles/Project3_MatrixMultiplication.dir/main.cpp.obj	8ac90da365aa7f66
+328	398	7005279373861084	Project3_MatrixMultiplication.exe	ebe1a4571aeef803

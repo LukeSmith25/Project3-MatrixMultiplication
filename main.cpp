@@ -18,7 +18,8 @@ int main() {
     cin >> dim1 >> dim2;
 
     // Declare Two Matrices
-    SquareMatrix matrixA = *new SquareMatrix(dim1);
+    SquareMatrix matrixA = SquareMatrix(dim1);
+    matrixA.displayMatrix();
     SquareMatrix matrixB = *new SquareMatrix(dim2);
 
     // Read in Matrices
@@ -26,7 +27,7 @@ int main() {
     for (int i = 0; i < dim1; i++) {
         for (int j = 0; j < dim1; j++) {
             cin >> input;
-            matrixA.*data[i][j] = input;
+            matrixA.data[i][j] = input;
         }
     }
 

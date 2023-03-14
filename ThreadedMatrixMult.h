@@ -18,32 +18,47 @@ using namespace std;
 struct SquareMatrix{
     int dim;
     int** data;    // points to a [dim x dim] square matrix
-    SquareMatrix(int size) {
-        this->dim = size;
-        this->data = nullptr;
+
+    /*
+     * Function Name: SquareMatrix Constructor
+     * Description:   Default constructor for SquareMatrix
+     * Return:        Void
+     * Pre:           User enters Dimension for matrix
+     * Post:          SquareMatrix object is created and data is initialized to 0
+     */
+    SquareMatrix(int dim) {
+        this->dim = dim;
+        this->data = new int *[dim];
+        for (int i = 0; i < dim; i++) {
+            data[i] = new int[dim];
+            for (int j = 0; j < dim; j++) {
+                data[i][j] = 0;
+            }
+        }
+    }
+
+    /*
+     * Function Name: displayMatrix
+     * Description:   Function displays the dimension and the matrix's data
+     * Return:        void
+     * Pre:           SquareMatrix struct exists
+     * Post:          Attributes of SquareMatrix are displayed
+     */
+    void displayMatrix() {
+        cout << this->dim << endl;
+        for (int i = 0; i < this->dim; i++) {
+            for (int j = 0; j < this->dim; j++) {
+                cout << this->data[i][j] << " ";
+            }
+            cout << endl;
+        }
     }
 };
 
 void * BruteForceSquareMatrixMultiplication(void *);
 
-void setMatrix(SquareMatrix* A,int* array) {
-    for (int i = 0; i < A->dim; i++) {
-        for(int j = 0; j < A->dim; j++) {
-            // Take Int Array and Populate Matrix Data
-        }
-    }
-}
 
-static void displayMatrix(SquareMatrix* matrix) {
-    cout << matrix->dim << endl;
-    for (int i = 0; i < matrix->dim; i++) {
-        // For Size of Col B
-        for (int j = 0; j < matrix->dim; j++) {
-            cout << matrix->data[i][j] << " ";
-        }
-        cout << endl;
-    }
-}
+
 
 //************************************************************
 // description: read data from specified file                *

@@ -63,7 +63,7 @@ struct SquareMatrix{
      * Pre:           Two SquareMatrix structs exists
      * Post:          Resultant Matrix is returned
      */
-    SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
+    static SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
         auto* result = new SquareMatrix(A.dim);
         result->dim = A.dim;
         // For Size of Row A
@@ -73,7 +73,6 @@ struct SquareMatrix{
                 // For Size of Col A (To Get Actual Values From A)
                 for (int k = 0; k < A.dim; k++) {
                     result->data[i][j] += A.data[i][k] * B.data[k][j];
-                    cout << result->data[i][j] << " = " << A.data[i][k] << B.data[k][j];
                 }
             }
         }
@@ -135,8 +134,9 @@ void * BruteForceSquareMatrixMultiplication(void *);
 
 
 // Threads share the matrices
-struct AllMatrix {
-    SquareMatrix A;
+struct ThreadedMatrix {
+    SquareMatrix *A, *B, *R;
+    // Bounds so Dim/2
 };
 
 #endif //PROJECT3_MATRIXMULTIPLICATION_THREADEDMATRIXMULT_H

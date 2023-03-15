@@ -18,22 +18,33 @@ int main() {
     cin >> dim1 >> dim2;
 
     // Declare Two Matrices
-    SquareMatrix matrixA = SquareMatrix(dim1);
-    matrixA.displayMatrix();
-    SquareMatrix matrixB = SquareMatrix(dim2);
-    matrixB.displayMatrix();
+    SquareMatrix* matrixA = new SquareMatrix(dim1);
+    SquareMatrix* matrixB = new SquareMatrix(dim2);
 
-    // Read in Matrices
+    // Read in Matrix A
     int input;
     for (int i = 0; i < dim1; i++) {
         for (int j = 0; j < dim1; j++) {
             cin >> input;
-            matrixA.data[i][j] = input;
+            matrixA->data[i][j] = input;
         }
     }
+    matrixA->displayMatrix();
+    cout << endl;
 
-    //displayMatrix(matrixA);
-    //displayMatrix(matrixB);
+    // Read in Matrix B
+    for (int i = 0; i < dim2; i++) {
+        for (int j = 0; j < dim2; j++) {
+            cin >> input;
+            matrixB->data[i][j] = input;
+        }
+    }
+    matrixB->displayMatrix();
+    cout << endl;
+
+    // Test Brute Force
+    SquareMatrix* resultant = SquareMatrix::BruteForce(*matrixA, *matrixB);
+    resultant->displayMatrix();
 
     return 0;
 }

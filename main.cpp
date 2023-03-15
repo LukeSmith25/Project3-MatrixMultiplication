@@ -29,7 +29,7 @@ int main() {
             matrixA->data[i][j] = input;
         }
     }
-    matrixA->displayMatrix();
+    displayMatrix(matrixA);
     cout << endl;
 
     // Read in Matrix B
@@ -39,12 +39,15 @@ int main() {
             matrixB->data[i][j] = input;
         }
     }
-    matrixB->displayMatrix();
+    displayMatrix(matrixB);
     cout << endl;
 
     // Test Brute Force
-    SquareMatrix* resultant = SquareMatrix::BruteForce(*matrixA, *matrixB);
-    resultant->displayMatrix();
+    SquareMatrix* resultant1 = BruteForce(*matrixA, *matrixB);
+    displayMatrix(resultant1);
+
+    // Test Strassen
+    SquareMatrix* resultant2 = Strassen(*matrixA, *matrixB);
 
     return 0;
 }

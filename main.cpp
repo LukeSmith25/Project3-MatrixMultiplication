@@ -48,6 +48,7 @@ int main() {
 
     // Test Strassen
     SquareMatrix* resultant2 = Strassen(*matrixA, *matrixB);
+    displayMatrix(resultant2);
 
     return 0;
 }

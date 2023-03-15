@@ -63,22 +63,22 @@ void displayMatrix(const SquareMatrix* m) {
  * Description:   Multiplies two matrices using brute force method
  * Return:        SquareMatrix Pointer
  * Pre:           Two SquareMatrix structs exists
- * Post:          Resultant Matrix is returned
+ * Post:          C Matrix is returned
  */
 SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
-    auto* resultant = new SquareMatrix(A.dim);
-    resultant->dim = A.dim;
+    auto* C = new SquareMatrix(A.dim);
+    C->dim = A.dim;
     // For Size of Row A
     for (int i = 0; i < A.dim; i++) {
         // For Size of Col B
         for (int j = 0; j < B.dim; j++) {
             // For Size of Col A (To Get Actual Values From A)
             for (int k = 0; k < A.dim; k++) {
-                resultant->data[i][j] += A.data[i][k] * B.data[k][j];
+                C->data[i][j] += A.data[i][k] * B.data[k][j];
             }
         }
     }
-    return resultant;
+    return C;
 }
 
 /*
@@ -93,15 +93,8 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
 }
 
 SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
-    /*
-     * S1 = (A11 + A22) * (B11 + B22)
-     * S2 = (A21 + A22) *  B11
-     * S3 = A11 * (B12 – B22)
-     * S4 = A22 * (B21 – B11)
-     * S5 = (A11 + A12) * B22
-     * S6 = (A21 – A11) * (B11 + B12)
-     * S7 = (A12 – A22) * (B21 + B22)
-     */
+
+    SquareMatrix* C = new SquareMatrix(A.dim);
     unordered_map<string,int> matrixMap;
 
     // Store Matrix A
@@ -111,7 +104,7 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
             element += to_string(i+1);
             element += to_string(j+1);
             matrixMap.emplace(element, A.data[i][j]);
-            cout << "STORING: " << element << " " << A.data << endl;
+            cout << "STORING: " << element << " " << A.data[i][j] << endl;
         }
     }
 
@@ -122,11 +115,35 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
             element += to_string(i+1);
             element += to_string(j+1);
             matrixMap.emplace(element, B.data[i][j]);
-            cout << "STORING: " << element << " " << B.data << endl;
+            cout << "STORING: " << element << " " << B.data[i][j] << endl;
         }
     }
 
+    /*
+     * S1 = (A11 + A22) * (B11 + B22)
+     * S2 = (A21 + A22) *  B11
+     * S3 = A11 * (B12 – B22)
+     * S4 = A22 * (B21 – B11)
+     * S5 = (A11 + A12) * B22
+     * S6 = (A21 – A11) * (B11 + B12)
+     * S7 = (A12 – A22) * (B21 + B22)
+     */
     int S1, S2, S3, S4, S5, S6, S7;
+    S1 = (matrixMap["A11"] + matrixMap["A22"]) * (matrixMap["B11"] + matrixMap["B22"]);
+    S2 = (matrixMap["A21"] + matrixMap["A22"]) * matrixMap["B11"];
+    S3 = matrixMap["A11"] * (matrixMap["B12"] - matrixMap["B22"]);
+    S4 = matrixMap["A22"] * (matrixMap["B21"] - matrixMap["B11"]);
+    S5 = (matrixMap["A11"] + matrixMap["A12"]) * matrixMap["B22"];
+    S6 = (matrixMap["A21"] - matrixMap["A11"]) * (matrixMap["B11"] + matrixMap["B12"]);
+    S7 = (matrixMap["A12"] - matrixMap["A22"]) * (matrixMap["B21"] + matrixMap["B22"]);
+
+    C->data[0][0] = S2 + S3 - S6 - S7;
+    C->data[0][1] = S4 + S6;
+    C->data[1][0] = S5 + S7;
+    C->data[1][1] = S1 + S3 - S4 - S5;
+
+
+    return C;
 }
 
 void * BruteForceSquareMatrixMultiplication(void *);

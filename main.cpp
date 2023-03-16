@@ -29,6 +29,7 @@ int main() {
             matrixA->data[i][j] = input;
         }
     }
+    cout << "MatrixA: " << endl;
     displayMatrix(matrixA);
     cout << endl;
 
@@ -39,6 +40,7 @@ int main() {
             matrixB->data[i][j] = input;
         }
     }
+    cout << "MatrixB: " << endl;
     displayMatrix(matrixB);
     cout << endl;
 

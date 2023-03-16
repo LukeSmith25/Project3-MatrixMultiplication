@@ -16,6 +16,7 @@
 #include <thread>
 using namespace std;
 
+struct ThreadedMatrix;
 
 struct SquareMatrix{
     int dim;
@@ -89,7 +90,8 @@ SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
  * Post:          Attributes of SquareMatrix are displayed
  */
 SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix& B) {
-    auto* result = new SquareMatrix(A.dim);
+    auto* C = new SquareMatrix(A.dim);
+    //auto* threadedMatrix = new ThreadedMatrix(A, B, C);
 }
 
 SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
@@ -137,10 +139,10 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
     S6 = (matrixMap["A21"] - matrixMap["A11"]) * (matrixMap["B11"] + matrixMap["B12"]);
     S7 = (matrixMap["A12"] - matrixMap["A22"]) * (matrixMap["B21"] + matrixMap["B22"]);
 
-    C->data[0][0] = S2 + S3 - S6 - S7;
-    C->data[0][1] = S4 + S6;
-    C->data[1][0] = S5 + S7;
-    C->data[1][1] = S1 + S3 - S4 - S5;
+    C->data[0][0] = S1 + S4 - S5 + S7;
+    C->data[0][1] = S3 + S5;
+    C->data[1][0] = S2 + S4;
+    C->data[1][1] = S1 - S2 + S3 + S6;
 
 
     return C;
@@ -155,10 +157,10 @@ struct ThreadedMatrix {
     SquareMatrix *R;
     int resDim, rowStart, rowEnd, colStart, colEnd;
 
-    ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *r) {
+    ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *c) {
         this->A = a;
         this->B = b;
-        this->R = r;
+        this->R = c;
         // Pass All Dimensions and Figure Out How to Divide in Functions
         this->resDim = a->dim;
         this->rowStart = a->dim;

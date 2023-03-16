@@ -41,22 +41,15 @@ struct SquareMatrix{
     }
 };
 
-
 /*
- * Function Name: displayMatrix
- * Description:   Function displays the dimension and the matrix's data
- * Return:        void
- * Pre:           SquareMatrix struct exists
- * Post:          Attributes of SquareMatrix are displayed
+ * Function Name: BruteForceMultiplication
+ * Description:   Function uses brute force to multiply two matrices passed in
+ * Return:        void *
+ * Pre:           ThreadedMatrix struct exists
+ * Post:          Pointer to memory is returned
  */
-void displayMatrix(const SquareMatrix* m) {
-    cout << "Dimension: " << m->dim << endl;
-    for (int i = 0; i < m->dim; i++) {
-        for (int j = 0; j < m->dim; j++) {
-            cout << m->data[i][j] << " ";
-        }
-        cout << endl;
-    }
+void * BruteForceMultiplication(void *) {
+
 }
 
 /*
@@ -90,8 +83,11 @@ SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
  * Post:          Attributes of SquareMatrix are displayed
  */
 SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix& B) {
+    int dim = A.dim;
     auto* C = new SquareMatrix(A.dim);
     //auto* threadedMatrix = new ThreadedMatrix(A, B, C);
+
+
 }
 
 SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
@@ -148,7 +144,22 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
     return C;
 }
 
-void * BruteForceSquareMatrixMultiplication(void *);
+/*
+ * Function Name: displayMatrix
+ * Description:   Function displays the dimension and the matrix's data
+ * Return:        void
+ * Pre:           SquareMatrix struct exists
+ * Post:          Attributes of SquareMatrix are displayed
+ */
+void displayMatrix(const SquareMatrix* m) {
+    cout << "Dimension: " << m->dim << endl;
+    for (int i = 0; i < m->dim; i++) {
+        for (int j = 0; j < m->dim; j++) {
+            cout << m->data[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
 
 // Threads share the matrices
 struct ThreadedMatrix {

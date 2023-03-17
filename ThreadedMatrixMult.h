@@ -48,8 +48,8 @@ struct SquareMatrix{
  * Pre:           ThreadedMatrix struct exists
  * Post:          Pointer to memory is returned
  */
-void * BruteForceMultiplication(void *) {
-
+void* BruteForceMultiplication(ThreadedMatrix& threadedMatrix) {
+    for (int i = threadedMatrix; )
 }
 
 /*
@@ -85,11 +85,26 @@ SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
 SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix& B) {
     int dim = A.dim;
     auto* C = new SquareMatrix(A.dim);
-    //auto* threadedMatrix = new ThreadedMatrix(A, B, C);
 
+    // Split Matrices by Dim/2 so 4x4 -> 4, 2x2 Matrices
 
+    // Since the Matrices are split, iteration becomes 0->dim/2
+    for (int i = 0; i < dim/2; i++) {
+        for (int j = 0; j < dim/2; j++) {
+            
+        }
+    }
+
+    return C;
 }
 
+/*
+ * Function Name: Strassen
+ * Description:   Multiplies two matrices using Strassen's method
+ * Return:        SquareMatrix Pointer
+ * Pre:           Two SquareMatrix structs exists
+ * Post:          C Matrix is returned
+ */
 SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
 
     SquareMatrix* C = new SquareMatrix(A.dim);
@@ -166,18 +181,15 @@ struct ThreadedMatrix {
     SquareMatrix *A;
     SquareMatrix *B;
     SquareMatrix *R;
-    int resDim, rowStart, rowEnd, colStart, colEnd;
+    int rowStart, rowEnd;
 
-    ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *c) {
+    ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *c, int rowStart, int rowEnd) {
         this->A = a;
         this->B = b;
         this->R = c;
         // Pass All Dimensions and Figure Out How to Divide in Functions
-        this->resDim = a->dim;
-        this->rowStart = a->dim;
-        this->rowEnd = a->dim;
-        this->colStart = a->dim;
-        this->colEnd = a->dim;
+        this->rowStart = rowStart;
+        this->rowEnd = rowEnd;
     }
 };
 

@@ -41,6 +41,23 @@ struct SquareMatrix{
     }
 };
 
+// Threads share the matrices
+struct ThreadedMatrix {
+    SquareMatrix *A;
+    SquareMatrix *B;
+    SquareMatrix *R;
+    int rowStart, rowEnd;
+
+    ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *c, int rowStart, int rowEnd) {
+        this->A = a;
+        this->B = b;
+        this->R = c;
+        // Pass All Dimensions and Figure Out How to Divide in Functions
+        this->rowStart = rowStart;
+        this->rowEnd = rowEnd;
+    }
+};
+
 /*
  * Function Name: BruteForceMultiplication
  * Description:   Function uses brute force to multiply two matrices passed in
@@ -49,7 +66,11 @@ struct SquareMatrix{
  * Post:          Pointer to memory is returned
  */
 void* BruteForceMultiplication(ThreadedMatrix& threadedMatrix) {
-    for (int i = threadedMatrix; )
+    for (int i = threadedMatrix.rowStart; i < threadedMatrix.rowEnd; i++) {
+        for (int j = threadedMatrix.rowStart; j < threadedMatrix.rowEnd; j++) {
+
+        }
+    }
 }
 
 /*
@@ -176,21 +197,6 @@ void displayMatrix(const SquareMatrix* m) {
     }
 }
 
-// Threads share the matrices
-struct ThreadedMatrix {
-    SquareMatrix *A;
-    SquareMatrix *B;
-    SquareMatrix *R;
-    int rowStart, rowEnd;
 
-    ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *c, int rowStart, int rowEnd) {
-        this->A = a;
-        this->B = b;
-        this->R = c;
-        // Pass All Dimensions and Figure Out How to Divide in Functions
-        this->rowStart = rowStart;
-        this->rowEnd = rowEnd;
-    }
-};
 
 #endif //PROJECT3_MATRIXMULTIPLICATION_THREADEDMATRIXMULT_H

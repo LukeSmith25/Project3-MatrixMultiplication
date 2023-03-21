@@ -45,12 +45,18 @@ int main() {
     cout << endl;
 
     // Test Brute Force
+    cout << "TESTING: BruteForce" << endl;
     SquareMatrix* resultant1 = BruteForce(*matrixA, *matrixB);
     displayMatrix(resultant1);
 
-    // Test Strassen
-    SquareMatrix* resultant2 = Strassen(*matrixA, *matrixB);
+    // Test ThreadedDivideAndConquer
+    cout << "TESTING: ThreadedDivideAndConquer" << endl;
+    SquareMatrix* resultant2 = ThreadedDivideAndConquer(*matrixA, *matrixB);
     displayMatrix(resultant2);
+
+    // Test Strassen
+    SquareMatrix* resultant3 = Strassen(*matrixA, *matrixB);
+    displayMatrix(resultant3);
 
     return 0;
 }

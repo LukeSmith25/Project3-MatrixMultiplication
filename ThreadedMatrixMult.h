@@ -65,10 +65,15 @@ struct ThreadedMatrix {
  * Pre:           ThreadedMatrix struct exists
  * Post:          Pointer to memory is returned
  */
-void* BruteForceMultiplication(ThreadedMatrix& threadedMatrix) {
-    for (int i = threadedMatrix.rowStart; i < threadedMatrix.rowEnd; i++) {
-        for (int j = threadedMatrix.rowStart; j < threadedMatrix.rowEnd; j++) {
+void* BruteForceMultiplication(void* tMatrix) {
+    ThreadedMatrix* threadedMatrix = (ThreadedMatrix*) tMatrix;
 
+    // Calculate the multiplication of the two submatrices
+    for (int i = threadedMatrix->rowStart; i < threadedMatrix->rowEnd; i++) {
+        for (int j = 0; j < threadedMatrix->B->dim; j++) {
+            for (int k = 0; k < threadedMatrix->A->dim; k++) {
+                threadedMatrix->R->data[i][j] += threadedMatrix->A->data[i][k] * threadedMatrix->B->data[k][j];
+            }
         }
     }
 }
@@ -104,15 +109,68 @@ SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
  * Post:          Attributes of SquareMatrix are displayed
  */
 SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix& B) {
+    // Store dimension and Create Resultant
     int dim = A.dim;
     auto* C = new SquareMatrix(A.dim);
 
-    // Split Matrices by Dim/2 so 4x4 -> 4, 2x2 Matrices
+    // Base Case: 1
+    if (dim == 1) {
+        C->data[0][0] = A.data[0][0] * B.data[0][0];
+        return C;
+    }
 
-    // Since the Matrices are split, iteration becomes 0->dim/2
-    for (int i = 0; i < dim/2; i++) {
-        for (int j = 0; j < dim/2; j++) {
-            
+    // Split Matrices by Dim/2 so 4x4 -> 4, 2x2 Matrices
+    int mid = dim/2;
+    auto* A11 = new SquareMatrix(mid);
+    auto* A12 = new SquareMatrix(mid);
+    auto* A21 = new SquareMatrix(mid);
+    auto* A22 = new SquareMatrix(mid);
+
+    auto* B11 = new SquareMatrix(mid);
+    auto* B12 = new SquareMatrix(mid);
+    auto* B21 = new SquareMatrix(mid);
+    auto* B22 = new SquareMatrix(mid);
+
+    // Transfer Data from A & B to Sub-Matrices
+    for (int i = 0; i < mid; i++) {
+        for (int j = 0; j < mid; j++) {
+            A11->data[i][j] = A.data[i][j];
+            A12->data[i][j] = A.data[i][j + mid];
+            A21->data[i][j] = A.data[i + mid][j];
+            A22->data[i][j] = A.data[i + mid][j + mid];
+
+            B11->data[i][j] = B.data[i][j];
+            B12->data[i][j] = B.data[i][j + mid];
+            B21->data[i][j] = B.data[i + mid][j];
+            B22->data[i][j] = B.data[i + mid][j + mid];
+        }
+    }
+
+    // Create Threaded Matrices
+    auto* tA11 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), 0, mid);
+    auto* tA12 = new ThreadedMatrix(A12, B21, new SquareMatrix(mid), 0, mid);
+    auto* tA21 = new ThreadedMatrix(A21, B12, new SquareMatrix(mid), mid, dim);
+    auto* tA22 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), mid, dim);
+
+    // Pass Matrices To Threads
+    thread t1(&BruteForceMultiplication, (void *)tA11);
+    thread t2(&BruteForceMultiplication, (void *)tA12);
+    thread t3(&BruteForceMultiplication, (void *)tA21);
+    thread t4(&BruteForceMultiplication, (void *)tA22);
+
+    // Join the Threads Results
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+
+    // Combine the submatrices to form the final output matrix
+    for (int i = 0; i < mid; i++) {
+        for (int j = 0; j < mid; j++) {
+            C->data[i][j] = tA11->R->data[i][j] + tA12->R->data[i][j];
+            C->data[i][j + mid] = tA11->R->data[i][j + mid] + tA12->R->data[i][j + mid];
+            C->data[i + mid][j] = tA21->R->data[i][j] + tA22->R->data[i][j];
+            C->data[i + mid][j + mid] = tA21->R->data[i][j + mid] + tA22->R->data[i][j + mid];
         }
     }
 
@@ -175,7 +233,6 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
     C->data[0][1] = S3 + S5;
     C->data[1][0] = S2 + S4;
     C->data[1][1] = S1 - S2 + S3 + S6;
-
 
     return C;
 }

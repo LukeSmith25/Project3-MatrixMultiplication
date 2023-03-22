@@ -16,7 +16,14 @@
 #include <thread>
 using namespace std;
 
+struct SquareMatrix;
 struct ThreadedMatrix;
+
+void* BruteForceMultiplication(void* tMatrix);
+SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B);
+SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix& B);
+SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B);
+void displayMatrix(const SquareMatrix* m);
 
 struct SquareMatrix{
     int dim;
@@ -55,6 +62,9 @@ struct ThreadedMatrix {
         // Pass All Dimensions and Figure Out How to Divide in Functions
         this->rowStart = rowStart;
         this->rowEnd = rowEnd;
+        // TESTING //
+        //displayMatrix(A);
+        //displayMatrix(B);
     }
 };
 
@@ -70,12 +80,13 @@ void* BruteForceMultiplication(void* tMatrix) {
 
     // Calculate the multiplication of the two submatrices
     for (int i = threadedMatrix->rowStart; i < threadedMatrix->rowEnd; i++) {
-        for (int j = 0; j < threadedMatrix->B->dim; j++) {
-            for (int k = 0; k < threadedMatrix->A->dim; k++) {
+        for (int j = threadedMatrix->rowStart; j < threadedMatrix->rowEnd; j++) {
+            for (int k = 0; k < threadedMatrix->A->dim-1; k++) {
                 threadedMatrix->R->data[i][j] += threadedMatrix->A->data[i][k] * threadedMatrix->B->data[k][j];
             }
         }
     }
+    return nullptr;
 }
 
 /*
@@ -145,6 +156,16 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
             B22->data[i][j] = B.data[i + mid][j + mid];
         }
     }
+    // TESTING //
+    displayMatrix(A11);
+    displayMatrix(A12);
+    displayMatrix(A21);
+    displayMatrix(A22);
+
+    displayMatrix(B11);
+    displayMatrix(B12);
+    displayMatrix(B21);
+    displayMatrix(B22);
 
     // Create Threaded Matrices
     auto* tA11 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), 0, mid);
@@ -153,10 +174,10 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
     auto* tA22 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), mid, dim);
 
     // Pass Matrices To Threads
-    thread t1(&BruteForceMultiplication, (void *)tA11);
-    thread t2(&BruteForceMultiplication, (void *)tA12);
-    thread t3(&BruteForceMultiplication, (void *)tA21);
-    thread t4(&BruteForceMultiplication, (void *)tA22);
+    thread t1(BruteForceMultiplication, (void *)tA11);
+    thread t2(BruteForceMultiplication, (void *)tA12);
+    thread t3(BruteForceMultiplication, (void *)tA21);
+    thread t4(BruteForceMultiplication, (void *)tA22);
 
     // Join the Threads Results
     t1.join();
@@ -167,12 +188,14 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
     // Combine the submatrices to form the final output matrix
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
-            C->data[i][j] = tA11->R->data[i][j] + tA12->R->data[i][j];
-            C->data[i][j + mid] = tA11->R->data[i][j + mid] + tA12->R->data[i][j + mid];
-            C->data[i + mid][j] = tA21->R->data[i][j] + tA22->R->data[i][j];
-            C->data[i + mid][j + mid] = tA21->R->data[i][j + mid] + tA22->R->data[i][j + mid];
+            C->data[i][j]             += tA11->R->data[i][j] + tA12->R->data[i][j];
+            C->data[i][j + mid]       += tA11->R->data[i][j + mid] + tA12->R->data[i][j + mid];
+            C->data[i + mid][j]       += tA21->R->data[i][j] + tA22->R->data[i][j];
+            C->data[i + mid][j + mid] += tA21->R->data[i][j + mid] + tA22->R->data[i][j + mid];
         }
     }
+
+
 
     return C;
 }
@@ -196,7 +219,7 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
             element += to_string(i+1);
             element += to_string(j+1);
             matrixMap.emplace(element, A.data[i][j]);
-            cout << "STORING: " << element << " " << A.data[i][j] << endl;
+            //cout << "STORING: " << element << " " << A.data[i][j] << endl;
         }
     }
 
@@ -207,7 +230,7 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
             element += to_string(i+1);
             element += to_string(j+1);
             matrixMap.emplace(element, B.data[i][j]);
-            cout << "STORING: " << element << " " << B.data[i][j] << endl;
+            //cout << "STORING: " << element << " " << B.data[i][j] << endl;
         }
     }
 
@@ -229,12 +252,24 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
     S6 = (matrixMap["A21"] - matrixMap["A11"]) * (matrixMap["B11"] + matrixMap["B12"]);
     S7 = (matrixMap["A12"] - matrixMap["A22"]) * (matrixMap["B21"] + matrixMap["B22"]);
 
+    // FIX THE RESULTANT //
     C->data[0][0] = S1 + S4 - S5 + S7;
     C->data[0][1] = S3 + S5;
     C->data[1][0] = S2 + S4;
     C->data[1][1] = S1 - S2 + S3 + S6;
 
     return C;
+}
+
+/*
+ * Function Name: ThreadedStrassen
+ * Description:   Multiplies two matrices using Threaded Strassen method
+ * Return:        SquareMatrix Pointer
+ * Pre:           Two SquareMatrix structs exists
+ * Post:          C Matrix is returned
+ */
+SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
+    // Call void BruteForce 8 times
 }
 
 /*

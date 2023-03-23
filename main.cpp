@@ -51,8 +51,8 @@ int main() {
 
     // Test ThreadedDivideAndConquer
     cout << endl << "TESTING: ThreadedDivideAndConquer" << endl;
-    SquareMatrix* resultant2 = ThreadedDivideAndConquer(*matrixA, *matrixB);
-    displayMatrix(resultant2);
+    //SquareMatrix* resultant2 = ThreadedDivideAndConquer(*matrixA, *matrixB);
+    //displayMatrix(resultant2);
 
     // Test Strassen
     cout << endl << "TESTING: Strassen" << endl;

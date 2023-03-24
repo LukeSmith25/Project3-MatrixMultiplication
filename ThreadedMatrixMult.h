@@ -351,9 +351,7 @@ void add(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, in
 void sub(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, int mid) {
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
-            cout << A.data[i][j] << " - " << B.data[i][j] << endl;
             C.data[i][j] = A.data[i][j] - B.data[i][j];
-            cout << C.data[i][j] << endl;
         }
     }
 }

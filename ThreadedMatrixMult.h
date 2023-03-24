@@ -262,7 +262,7 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
     auto* s9 = new SquareMatrix(mid);
     auto* s10 = new SquareMatrix(mid);
 
-    sub(*B11, *B22, *s1, mid);
+    sub(*B12, *B22, *s1, mid);
     add(*A11, *A12, *s2, mid);
     add(*A21, *A22, *s3, mid);
     sub(*B21, *B11, *s4, mid);
@@ -319,6 +319,10 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
 
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
+            C->data[i][j]            = C11->data[i][j];
+            C->data[i][j + mid]      = C12->data[i][j];
+            C->data[i + mid][j]      = C21->data[i][j];
+            C->data[i + mid][j+ mid] = C22->data[i][j];
         }
     }
 
@@ -347,7 +351,9 @@ void add(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, in
 void sub(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, int mid) {
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
+            cout << A.data[i][j] << " - " << B.data[i][j] << endl;
             C.data[i][j] = A.data[i][j] - B.data[i][j];
+            cout << C.data[i][j] << endl;
         }
     }
 }

@@ -325,6 +325,10 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
             C->data[i + mid][j+ mid] = C22->data[i][j];
         }
     }
+    cout << "A11, s1, M1" << endl;
+    displayMatrix(A11);
+    displayMatrix(s1);
+    displayMatrix(M1);
 
     return C;
 }
@@ -338,6 +342,132 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
  */
 SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     // Call void BruteForce 8 times
+    int mid = A.dim/2;
+
+    // Declare sub-matrices
+    auto* A11 = new SquareMatrix(mid);
+    auto* A12 = new SquareMatrix(mid);
+    auto* A21 = new SquareMatrix(mid);
+    auto* A22 = new SquareMatrix(mid);
+    auto* B11 = new SquareMatrix(mid);
+    auto* B12 = new SquareMatrix(mid);
+    auto* B21 = new SquareMatrix(mid);
+    auto* B22 = new SquareMatrix(mid);
+    auto* C11 = new SquareMatrix(mid);
+    auto* C12 = new SquareMatrix(mid);
+    auto* C21 = new SquareMatrix(mid);
+    auto* C22 = new SquareMatrix(mid);
+    // Declare resultant matrix
+    SquareMatrix* C = new SquareMatrix(A.dim);
+
+    // Split data into sub-matrices
+    for (int i = 0; i < mid; i++) {
+        for (int j = 0; j < mid; j++) {
+            A11->data[i][j] = A.data[i][j];
+            A12->data[i][j] = A.data[i][j + mid];
+            A21->data[i][j] = A.data[i + mid][j];
+            A22->data[i][j] = A.data[i + mid][j + mid];
+
+            B11->data[i][j] = B.data[i][j];
+            B12->data[i][j] = B.data[i][j + mid];
+            B21->data[i][j] = B.data[i + mid][j];
+            B22->data[i][j] = B.data[i + mid][j + mid];
+        }
+    }
+
+    // Sub-Strassen's Add/Sub
+    auto* s1 = new SquareMatrix(mid);
+    auto* s2 = new SquareMatrix(mid);
+    auto* s3 = new SquareMatrix(mid);
+    auto* s4 = new SquareMatrix(mid);
+    auto* s5 = new SquareMatrix(mid);
+    auto* s6 = new SquareMatrix(mid);
+    auto* s7 = new SquareMatrix(mid);
+    auto* s8 = new SquareMatrix(mid);
+    auto* s9 = new SquareMatrix(mid);
+    auto* s10 = new SquareMatrix(mid);
+
+    sub(*B12, *B22, *s1, mid);
+    add(*A11, *A12, *s2, mid);
+    add(*A21, *A22, *s3, mid);
+    sub(*B21, *B11, *s4, mid);
+    add(*A11, *A22, *s5, mid);
+    add(*B11, *B22, *s6, mid);
+    sub(*A12, *A22, *s7, mid);
+    add(*B21, *B22, *s8, mid);
+    sub(*A11, *A21, *s9, mid);
+    add(*B11, *B12, *s10, mid);
+
+    auto* M1 = new SquareMatrix(mid);
+    auto* M2 = new SquareMatrix(mid);
+    auto* M3 = new SquareMatrix(mid);
+    auto* M4 = new SquareMatrix(mid);
+    auto* M5 = new SquareMatrix(mid);
+    auto* M6 = new SquareMatrix(mid);
+    auto* M7 = new SquareMatrix(mid);
+
+    /*
+    M1 = BruteForce(*A11, *s1);
+    M2 = BruteForce(*s2, *B22);
+    M3 = BruteForce(*s3, *B11);
+    M4 = BruteForce(*A22, *s4);
+    M5 = BruteForce(*s5, *s6);
+    M6 = BruteForce(*s7, *s8);
+    M7 = BruteForce(*s9, *s10);
+    auto* tA11 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), A.dim, 0, mid, 0, mid);
+    */
+    // Possibly make function to create threads
+    auto* tM1 = new ThreadedMatrix(A11, s1, new SquareMatrix(mid), mid, 0, mid, 0, mid);
+    auto* tM2 = new ThreadedMatrix(s2, B22, new SquareMatrix(mid), mid, 0, mid, 0, mid);
+    auto* tM3 = new ThreadedMatrix(s3, B11, new SquareMatrix(mid), mid, 0, mid, 0, mid);
+    auto* tM4 = new ThreadedMatrix(A22, s4, new SquareMatrix(mid), mid, 0, mid, 0, mid);
+    auto* tM5 = new ThreadedMatrix(s5, s6, new SquareMatrix(mid), mid, 0, mid, 0, mid);
+    auto* tM6 = new ThreadedMatrix(s7, s8, new SquareMatrix(mid), mid, 0, mid, 0, mid);
+    auto* tM7 = new ThreadedMatrix(s9, s10, new SquareMatrix(mid), mid, 0, mid, 0, mid);
+
+    thread t1(BruteForceMultiplication, (void *)tM1);
+    thread t2(BruteForceMultiplication, (void *)tM2);
+    thread t3(BruteForceMultiplication, (void *)tM3);
+    thread t4(BruteForceMultiplication, (void *)tM4);
+    thread t5(BruteForceMultiplication, (void *)tM5);
+    thread t6(BruteForceMultiplication, (void *)tM6);
+    thread t7(BruteForceMultiplication, (void *)tM7);
+
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+    t5.join();
+    t6.join();
+    t7.join();
+
+    auto* tempA = new SquareMatrix(mid);
+    auto* tempB = new SquareMatrix(mid);
+
+    // Calculate: C11
+    add(*M5, *M4,*tempA, mid);
+    add(*tempA, *M6, *tempB, mid);
+    sub(*tempB, *M2, *C11, mid);
+
+    // Calculate: C12
+    add(*M1, *M2, *C12, mid);
+    // Calculate: C21
+    add(*M3, *M4, *C21, mid);
+    // Calculate: C22
+    add(*M5, *M1, *tempA, mid);
+    sub(*tempA, *M3, *tempB, mid);
+    sub(*tempB, *M7, *C22, mid);
+
+    for (int i = 0; i < mid; i++) {
+        for (int j = 0; j < mid; j++) {
+            C->data[i][j]            = C11->data[i][j];
+            C->data[i][j + mid]      = C12->data[i][j];
+            C->data[i + mid][j]      = C21->data[i][j];
+            C->data[i + mid][j+ mid] = C22->data[i][j];
+        }
+    }
+
+    return C;
 }
 
 void add(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, int mid) {

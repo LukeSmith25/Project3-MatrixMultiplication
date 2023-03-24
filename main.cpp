@@ -59,5 +59,10 @@ int main() {
     SquareMatrix* resultant3 = Strassen(*matrixA, *matrixB);
     displayMatrix(resultant3);
 
+    // Test Threaded Strassen
+    cout << endl << "TESTING: Threaded Strassen" << endl;
+    SquareMatrix* resultant4 = ThreadedStrassen(*matrixA, *matrixB);
+    displayMatrix(resultant4);
+
     return 0;
 }

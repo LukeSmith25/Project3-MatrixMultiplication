@@ -57,13 +57,13 @@ struct SquareMatrix{
 struct ThreadedMatrix {
     SquareMatrix *A;
     SquareMatrix *B;
-    SquareMatrix *R;
+    SquareMatrix *C;
     int dim, rowStart, rowEnd, colStart, colEnd;
 
     ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *c, int dim, int rowStart, int rowEnd, int colStart, int colEnd) {
         this->A = a;
         this->B = b;
-        this->R = c;
+        this->C = c;
         // Pass All Dimensions and Figure Out How to Divide in Functions
         this->dim = dim;
         this->rowStart = rowStart;
@@ -87,12 +87,12 @@ void* BruteForceMultiplication(void* tMatrix) {
     ThreadedMatrix* threadedMatrix = (ThreadedMatrix*) tMatrix;
 
     int mid = threadedMatrix->dim/2;
-    // Calculate the multiplication of the two submatrices
-    for (int i = threadedMatrix->rowStart; i < threadedMatrix->rowStart + mid; i++) {
-        for (int j = threadedMatrix->colStart; j < threadedMatrix->colStart + mid; j++) {
-            cout << threadedMatrix->R->data[i][j] << endl;
-            for (int k = 0; k < threadedMatrix->R->dim; k++) {
-                threadedMatrix->R->data[i][j] += threadedMatrix->A->data[i][k] * threadedMatrix->B->data[k][j];
+    // Iterate 0->mid and change multiplications accordingly
+    for (int i = threadedMatrix->rowStart; i < mid; i++) {
+        for (int j = threadedMatrix->colStart; j < mid; j++) {
+            for (int k = 0; k < mid; k++) {
+                threadedMatrix->C->data[i][j] += threadedMatrix->A->data[j][k] * threadedMatrix->B->data[k][j];
+                cout << threadedMatrix->C->data[i][j] << endl;
             }
         }
     }
@@ -199,10 +199,10 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
     // Combine the submatrices to form the final output matrix
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
-            C->data[i][j]             += tA11->R->data[i][j] + tA12->R->data[i][j];
-            C->data[i][j + mid]       += tA11->R->data[i][j + mid] + tA12->R->data[i][j + mid];
-            C->data[i + mid][j]       += tA21->R->data[i][j] + tA22->R->data[i][j];
-            C->data[i + mid][j + mid] += tA21->R->data[i][j + mid] + tA22->R->data[i][j + mid];
+            C->data[i][j] += tA11->C->data[i][j] + tA12->C->data[i][j];
+            C->data[i][j + mid] += tA11->C->data[i][j + mid] + tA12->C->data[i][j + mid];
+            C->data[i + mid][j] += tA21->C->data[i][j] + tA22->C->data[i][j];
+            C->data[i + mid][j + mid] += tA21->C->data[i][j + mid] + tA22->C->data[i][j + mid];
         }
     }
 

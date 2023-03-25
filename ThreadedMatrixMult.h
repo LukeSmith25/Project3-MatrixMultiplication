@@ -61,16 +61,14 @@ struct ThreadedMatrix {
     SquareMatrix *C;
     int dim, rowStart, rowEnd, colStart, colEnd;
 
-    ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *c, int dim, int rowStart, int rowEnd, int colStart, int colEnd) {
+    ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *c, int dim, int rowStart, int colStart) {
         this->A = a;
         this->B = b;
         this->C = c;
         // Pass All Dimensions and Figure Out How to Divide in Functions
         this->dim = dim;
         this->rowStart = rowStart;
-        this->rowEnd = rowEnd;
         this->colStart = colStart;
-        this->colEnd = colEnd;
     }
 };
 
@@ -86,11 +84,10 @@ void* BruteForceMultiplication(void* tMatrix) {
     const SquareMatrix* A = threadedMatrix->A;
     const SquareMatrix* B = threadedMatrix->B;
 
-    cout << "threadedMatrixA" << endl;
-    displayMatrix(A);
-    cout << "threadedMatrixB" << endl;
-    displayMatrix(B);
-
+    //cout << "threadedMatrixA" << endl;
+    //displayMatrix(A);
+    //cout << "threadedMatrixB" << endl;
+    //displayMatrix(B);
 
     int mid = threadedMatrix->A->dim;
     // Iterate 0->mid and change multiplications accordingly
@@ -103,8 +100,8 @@ void* BruteForceMultiplication(void* tMatrix) {
             threadedMatrix->C->data[i][j] = sum;
         }
     }
-    cout << "threadedMatrixC" << endl;
-    displayMatrix(threadedMatrix->C);
+    //cout << "threadedMatrixC" << endl;
+    //displayMatrix(threadedMatrix->C);
     return nullptr;
 }
 
@@ -150,6 +147,7 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
 
     // Split Matrices by Dim/2 so 4x4 -> 4, 2x2 Matrices
     int mid = dim/2;
+
     auto* A11 = new SquareMatrix(mid);
     auto* A12 = new SquareMatrix(mid);
     auto* A21 = new SquareMatrix(mid);
@@ -174,22 +172,16 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
             B22->data[i][j] = B.data[i + mid][j + mid];
         }
     }
-    // TESTING //
-    // displayMatrix(A11);
-    // displayMatrix(A12);
-    // displayMatrix(A21);
-    // displayMatrix(A22);
-
-    // displayMatrix(B11);
-    // displayMatrix(B12);
-    // displayMatrix(B21);
-    // displayMatrix(B22);
 
     // Create Threaded Matrices
-    auto* tC11 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), A.dim, 0, mid, 0, mid);
-    auto* tC12 = new ThreadedMatrix(A12, B21, new SquareMatrix(mid), A.dim, mid, dim, 0, mid);
-    auto* tC21 = new ThreadedMatrix(A21, B12, new SquareMatrix(mid), A.dim, 0, mid, mid, dim);
-    auto* tC22 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), A.dim, mid, dim, mid, dim);
+    auto* tM1 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), dim, 0, 0);
+    auto* tM2 = new ThreadedMatrix(A12, B21, new SquareMatrix(mid), dim, 0, 0);
+    auto* tM3 = new ThreadedMatrix(A11, B12, new SquareMatrix(mid), dim, 0, 0);
+    auto* tM4 = new ThreadedMatrix(A12, B22, new SquareMatrix(mid), dim, 0, 0);
+    auto* tM5 = new ThreadedMatrix(A21, B11, new SquareMatrix(mid), dim, 0, 0);
+    auto* tM6 = new ThreadedMatrix(A22, B21, new SquareMatrix(mid), dim, 0, 0);
+    auto* tM7 = new ThreadedMatrix(A21, B12, new SquareMatrix(mid), dim, 0, 0);
+    auto* tM8 = new ThreadedMatrix(A22, B22, new SquareMatrix(mid), dim, 0, 0);
 
     // Pass Matrices To Threads
     /*
@@ -204,19 +196,32 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
     t3.join();
     t4.join();
     */
-    BruteForceMultiplication((void*) tC11);
-    BruteForceMultiplication((void*) tC12);
-    BruteForceMultiplication((void*) tC21);
-    BruteForceMultiplication((void*) tC22);
+    BruteForceMultiplication((void*) tM1);
+    BruteForceMultiplication((void*) tM2);
+    BruteForceMultiplication((void*) tM3);
+    BruteForceMultiplication((void*) tM4);
+    BruteForceMultiplication((void*) tM5);
+    BruteForceMultiplication((void*) tM6);
+    BruteForceMultiplication((void*) tM7);
+    BruteForceMultiplication((void*) tM8);
 
+    auto* C11 = new SquareMatrix(mid);
+    auto* C12 = new SquareMatrix(mid);
+    auto* C21 = new SquareMatrix(mid);
+    auto* C22 = new SquareMatrix(mid);
+
+    add(*tM1->C, *tM2->C, *C11, mid);
+    add(*tM3->C, *tM4->C, *C12, mid);
+    add(*tM5->C, *tM6->C, *C21, mid);
+    add(*tM7->C, *tM8->C, *C22, mid);
 
     // Combine the submatrices to form the final output matrix
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
-            C->data[i][j] += tC11->C->data[i][j] + tC12->C->data[i][j];
-            C->data[i][j + mid] += tC11->C->data[i][j + mid] + tC12->C->data[i][j + mid];
-            C->data[i + mid][j] += tC21->C->data[i][j] + tC22->C->data[i][j];
-            C->data[i + mid][j + mid] += tC21->C->data[i][j + mid] + tC22->C->data[i][j + mid];
+            C->data[i][j] += C11->data[i][j];
+            C->data[i][j + mid] += C12->data[i][j];
+            C->data[i + mid][j] += C21->data[i][j];
+            C->data[i + mid][j + mid] += C22->data[i][j];
         }
     }
 
@@ -429,13 +434,13 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     auto* tA11 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), A.dim, 0, mid, 0, mid);
     */
     // Possibly make function to create threads
-    auto* tM1 = new ThreadedMatrix(A11, s1, new SquareMatrix(mid), mid, 0, mid, 0, mid);
-    auto* tM2 = new ThreadedMatrix(s2, B22, new SquareMatrix(mid), mid, 0, mid, 0, mid);
-    auto* tM3 = new ThreadedMatrix(s3, B11, new SquareMatrix(mid), mid, 0, mid, 0, mid);
-    auto* tM4 = new ThreadedMatrix(A22, s4, new SquareMatrix(mid), mid, 0, mid, 0, mid);
-    auto* tM5 = new ThreadedMatrix(s5, s6, new SquareMatrix(mid), mid, 0, mid, 0, mid);
-    auto* tM6 = new ThreadedMatrix(s7, s8, new SquareMatrix(mid), mid, 0, mid, 0, mid);
-    auto* tM7 = new ThreadedMatrix(s9, s10, new SquareMatrix(mid), mid, 0, mid, 0, mid);
+    auto* tM1 = new ThreadedMatrix(A11, s1, new SquareMatrix(mid), mid, 0, 0);
+    auto* tM2 = new ThreadedMatrix(s2, B22, new SquareMatrix(mid), mid, 0, 0);
+    auto* tM3 = new ThreadedMatrix(s3, B11, new SquareMatrix(mid), mid, 0, 0);
+    auto* tM4 = new ThreadedMatrix(A22, s4, new SquareMatrix(mid), mid, 0, 0);
+    auto* tM5 = new ThreadedMatrix(s5, s6, new SquareMatrix(mid), mid, 0, 0);
+    auto* tM6 = new ThreadedMatrix(s7, s8, new SquareMatrix(mid), mid, 0, 0);
+    auto* tM7 = new ThreadedMatrix(s9, s10, new SquareMatrix(mid), mid, 0, 0);
 
     thread t1(BruteForceMultiplication, (void *)tM1);
     thread t2(BruteForceMultiplication, (void *)tM2);

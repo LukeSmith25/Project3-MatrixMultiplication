@@ -126,7 +126,7 @@ int main() {
     displayMatrix(resultant3);
 
     // Test Threaded Strassen
-    /*
+
     cout << endl << "TESTING: Threaded Strassen" << endl;
     SquareMatrix* resultant4;
     {
@@ -150,7 +150,7 @@ int main() {
         cout << setprecision(20) << average << endl;
     }
     displayMatrix(resultant4);
-     */
+
 
     return 0;
 }

@@ -91,6 +91,7 @@ void* BruteForceMultiplication(void* tMatrix) {
     cout << "threadedMatrixB" << endl;
     displayMatrix(B);
 
+
     int mid = threadedMatrix->A->dim;
     // Iterate 0->mid and change multiplications accordingly
     for (int i = 0; i < mid; i++) {

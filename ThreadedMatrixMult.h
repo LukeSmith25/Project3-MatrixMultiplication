@@ -16,6 +16,7 @@
 #include <thread>
 using namespace std;
 
+
 struct SquareMatrix;
 struct ThreadedMatrix;
 
@@ -70,9 +71,6 @@ struct ThreadedMatrix {
         this->rowEnd = rowEnd;
         this->colStart = colStart;
         this->colEnd = colEnd;
-        // TESTING //
-        //displayMatrix(A);
-        //displayMatrix(B);
     }
 };
 
@@ -85,17 +83,27 @@ struct ThreadedMatrix {
  */
 void* BruteForceMultiplication(void* tMatrix) {
     ThreadedMatrix* threadedMatrix = (ThreadedMatrix*) tMatrix;
+    const SquareMatrix* A = threadedMatrix->A;
+    const SquareMatrix* B = threadedMatrix->B;
 
-    int mid = threadedMatrix->dim/2;
+    cout << "threadedMatrixA" << endl;
+    displayMatrix(A);
+    cout << "threadedMatrixB" << endl;
+    displayMatrix(B);
+
+    int mid = threadedMatrix->A->dim;
     // Iterate 0->mid and change multiplications accordingly
-    for (int i = threadedMatrix->rowStart; i < mid; i++) {
-        for (int j = threadedMatrix->colStart; j < mid; j++) {
-            for (int k = 0; k < mid; k++) {
-                threadedMatrix->C->data[i][j] += threadedMatrix->A->data[j][k] * threadedMatrix->B->data[k][j];
-                cout << threadedMatrix->C->data[i][j] << endl;
+    for (int i = 0; i < mid; i++) {
+        for (int j = 0; j < mid; j++) {
+            int sum = 0;
+            for (int k = 0; k < threadedMatrix->C->dim; k++) {
+                sum += A->data[i][k] * B->data[k][j];
             }
+            threadedMatrix->C->data[i][j] = sum;
         }
     }
+    cout << "threadedMatrixC" << endl;
+    displayMatrix(threadedMatrix->C);
     return nullptr;
 }
 
@@ -108,7 +116,6 @@ void* BruteForceMultiplication(void* tMatrix) {
  */
 SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
     auto* C = new SquareMatrix(A.dim);
-    C->dim = A.dim;
     // For Size of Row A
     for (int i = 0; i < A.dim; i++) {
         // For Size of Col B
@@ -178,35 +185,39 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
     // displayMatrix(B22);
 
     // Create Threaded Matrices
-    auto* tA11 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), A.dim, 0, mid, 0, mid);
-    auto* tA12 = new ThreadedMatrix(A12, B21, new SquareMatrix(mid), A.dim, mid, dim, 0, mid);
-    auto* tA21 = new ThreadedMatrix(A21, B12, new SquareMatrix(mid), A.dim, 0, mid, mid, dim);
-    auto* tA22 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), A.dim, mid, dim, mid, dim);
+    auto* tC11 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), A.dim, 0, mid, 0, mid);
+    auto* tC12 = new ThreadedMatrix(A12, B21, new SquareMatrix(mid), A.dim, mid, dim, 0, mid);
+    auto* tC21 = new ThreadedMatrix(A21, B12, new SquareMatrix(mid), A.dim, 0, mid, mid, dim);
+    auto* tC22 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), A.dim, mid, dim, mid, dim);
 
     // Pass Matrices To Threads
-    thread t1(BruteForceMultiplication, (void *)tA11);
-    thread t2(BruteForceMultiplication, (void *)tA12);
-    thread t3(BruteForceMultiplication, (void *)tA21);
-    thread t4(BruteForceMultiplication, (void *)tA22);
+    /*
+    thread t1(BruteForceMultiplication, (void *)tC11);
+    thread t2(BruteForceMultiplication, (void *)tC12);
+    thread t3(BruteForceMultiplication, (void *)tC21);
+    thread t4(BruteForceMultiplication, (void *)tC22);
 
     // Join the Threads Results
     t1.join();
     t2.join();
     t3.join();
-    // BREAKS HERE
     t4.join();
+    */
+    BruteForceMultiplication((void*) tC11);
+    BruteForceMultiplication((void*) tC12);
+    BruteForceMultiplication((void*) tC21);
+    BruteForceMultiplication((void*) tC22);
+
 
     // Combine the submatrices to form the final output matrix
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
-            C->data[i][j] += tA11->C->data[i][j] + tA12->C->data[i][j];
-            C->data[i][j + mid] += tA11->C->data[i][j + mid] + tA12->C->data[i][j + mid];
-            C->data[i + mid][j] += tA21->C->data[i][j] + tA22->C->data[i][j];
-            C->data[i + mid][j + mid] += tA21->C->data[i][j + mid] + tA22->C->data[i][j + mid];
+            C->data[i][j] += tC11->C->data[i][j] + tC12->C->data[i][j];
+            C->data[i][j + mid] += tC11->C->data[i][j + mid] + tC12->C->data[i][j + mid];
+            C->data[i + mid][j] += tC21->C->data[i][j] + tC22->C->data[i][j];
+            C->data[i + mid][j + mid] += tC21->C->data[i][j + mid] + tC22->C->data[i][j + mid];
         }
     }
-
-
 
     return C;
 }
@@ -319,16 +330,16 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
 
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
-            C->data[i][j]            = C11->data[i][j];
-            C->data[i][j + mid]      = C12->data[i][j];
-            C->data[i + mid][j]      = C21->data[i][j];
+            C->data[i][j] = C11->data[i][j];
+            C->data[i][j + mid] = C12->data[i][j];
+            C->data[i + mid][j] = C21->data[i][j];
             C->data[i + mid][j+ mid] = C22->data[i][j];
         }
     }
-    cout << "A11, s1, M1" << endl;
-    displayMatrix(A11);
-    displayMatrix(s1);
-    displayMatrix(M1);
+    //cout << "A11, s1, M1" << endl;
+    //displayMatrix(A11);
+    //displayMatrix(s1);
+    //displayMatrix(M1);
 
     return C;
 }
@@ -504,6 +515,8 @@ void displayMatrix(const SquareMatrix* m) {
         cout << endl;
     }
 }
+
+
 
 
 

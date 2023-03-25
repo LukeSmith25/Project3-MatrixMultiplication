@@ -9,8 +9,12 @@
  */
 
 #include <iostream>
+#include <vector>
+#include <chrono>
+#include <iomanip>
 #include "ThreadedMatrixMult.h"
 using namespace std;
+using namespace chrono;
 
 int main() {
     // Read In Dimensions of Matrices
@@ -46,23 +50,107 @@ int main() {
 
     // Test Brute Force
     cout << endl << "TESTING: BruteForce" << endl;
-    SquareMatrix* resultant1 = BruteForce(*matrixA, *matrixB);
+    SquareMatrix* resultant1;
+    {
+        vector<decltype(high_resolution_clock::now() - high_resolution_clock::now())> data;
+        for (int m = 0; m < 20; m++) {
+            auto start = high_resolution_clock::now();
+
+            resultant1 = BruteForce(*matrixA, *matrixB);
+
+            auto stop = high_resolution_clock::now();
+            // Change micro to milli after changing size
+            data.emplace_back(duration_cast<microseconds>(stop - start));
+        }
+        double average = 0;
+
+        for (auto i: data) {
+            average += i.count();
+        }
+        average /= data.size();
+
+        cout << setprecision(20) << average << endl;
+    }
     displayMatrix(resultant1);
+
 
     // Test ThreadedDivideAndConquer
     cout << endl << "TESTING: ThreadedDivideAndConquer" << endl;
+    SquareMatrix* resultant2;
+    {
+        vector<decltype(high_resolution_clock::now() - high_resolution_clock::now())> data;
+        for (int m = 0; m < 20; m++) {
+            auto start = high_resolution_clock::now();
+
+            resultant2 = ThreadedDivideAndConquer(*matrixA, *matrixB);
+
+            auto stop = high_resolution_clock::now();
+            // Change micro to milli after changing size
+            data.emplace_back(duration_cast<microseconds>(stop - start));
+        }
+        double average = 0;
+
+        for (auto i: data) {
+            average += i.count();
+        }
+        average /= data.size();
+
+        cout << setprecision(20) << average << endl;
+    }
     //SquareMatrix* resultant2 = ThreadedDivideAndConquer(*matrixA, *matrixB);
-    //displayMatrix(resultant2);
+    displayMatrix(resultant2);
 
     // Test Strassen
     cout << endl << "TESTING: Strassen" << endl;
-    SquareMatrix* resultant3 = Strassen(*matrixA, *matrixB);
+    SquareMatrix* resultant3;
+    {
+        vector<decltype(high_resolution_clock::now() - high_resolution_clock::now())> data;
+        for (int m = 0; m < 20; m++) {
+            auto start = high_resolution_clock::now();
+
+            resultant3 = Strassen(*matrixA, *matrixB);
+
+            auto stop = high_resolution_clock::now();
+            // Change micro to milli after changing size
+            data.emplace_back(duration_cast<microseconds>(stop - start));
+        }
+        double average = 0;
+
+        for (auto i: data) {
+            average += i.count();
+        }
+        average /= data.size();
+
+        cout << setprecision(20) << average << endl;
+    }
     displayMatrix(resultant3);
 
     // Test Threaded Strassen
+    /*
     cout << endl << "TESTING: Threaded Strassen" << endl;
-    SquareMatrix* resultant4 = ThreadedStrassen(*matrixA, *matrixB);
+    SquareMatrix* resultant4;
+    {
+        vector<decltype(high_resolution_clock::now() - high_resolution_clock::now())> data;
+        for (int m = 0; m < 20; m++) {
+            auto start = high_resolution_clock::now();
+
+            resultant4 = ThreadedStrassen(*matrixA, *matrixB);
+
+            auto stop = high_resolution_clock::now();
+            // Change micro to milli after changing size
+            data.emplace_back(duration_cast<microseconds>(stop - start));
+        }
+        double average = 0;
+
+        for (auto i: data) {
+            average += i.count();
+        }
+        average /= data.size();
+
+        cout << setprecision(20) << average << endl;
+    }
     displayMatrix(resultant4);
+     */
 
     return 0;
 }

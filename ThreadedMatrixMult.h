@@ -358,10 +358,10 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
  * Post:          C Matrix is returned
  */
 SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
-    // Call void BruteForce 8 times
+    auto* C = new SquareMatrix(A.dim);
     int mid = A.dim/2;
 
-    // Declare sub-matrices
+    // Initialize sub-matrices
     auto* A11 = new SquareMatrix(mid);
     auto* A12 = new SquareMatrix(mid);
     auto* A21 = new SquareMatrix(mid);
@@ -374,10 +374,8 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     auto* C12 = new SquareMatrix(mid);
     auto* C21 = new SquareMatrix(mid);
     auto* C22 = new SquareMatrix(mid);
-    // Declare resultant matrix
-    SquareMatrix* C = new SquareMatrix(A.dim);
 
-    // Split data into sub-matrices
+    // Split A and B data into sub-matrices
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
             A11->data[i][j] = A.data[i][j];
@@ -393,6 +391,7 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     }
 
     // Sub-Strassen's Add/Sub
+    // Initialize sub-sub-strassen's matrices
     auto* s1 = new SquareMatrix(mid);
     auto* s2 = new SquareMatrix(mid);
     auto* s3 = new SquareMatrix(mid);
@@ -404,6 +403,7 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     auto* s9 = new SquareMatrix(mid);
     auto* s10 = new SquareMatrix(mid);
 
+    // Compute each sub-portion
     sub(*B12, *B22, *s1, mid);
     add(*A11, *A12, *s2, mid);
     add(*A21, *A22, *s3, mid);
@@ -415,6 +415,7 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     sub(*A11, *A21, *s9, mid);
     add(*B11, *B12, *s10, mid);
 
+    // Initialize Strassen's 7 Matrices
     auto* M1 = new SquareMatrix(mid);
     auto* M2 = new SquareMatrix(mid);
     auto* M3 = new SquareMatrix(mid);
@@ -423,7 +424,7 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     auto* M6 = new SquareMatrix(mid);
     auto* M7 = new SquareMatrix(mid);
 
-    /*
+    // Multiply and store result in matrices
     M1 = BruteForce(*A11, *s1);
     M2 = BruteForce(*s2, *B22);
     M3 = BruteForce(*s3, *B11);
@@ -431,8 +432,7 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     M5 = BruteForce(*s5, *s6);
     M6 = BruteForce(*s7, *s8);
     M7 = BruteForce(*s9, *s10);
-    auto* tA11 = new ThreadedMatrix(A11, B11, new SquareMatrix(mid), A.dim, 0, mid, 0, mid);
-    */
+
     // Possibly make function to create threads
     auto* tM1 = new ThreadedMatrix(A11, s1, new SquareMatrix(mid), mid, 0, 0);
     auto* tM2 = new ThreadedMatrix(s2, B22, new SquareMatrix(mid), mid, 0, 0);
@@ -442,6 +442,7 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     auto* tM6 = new ThreadedMatrix(s7, s8, new SquareMatrix(mid), mid, 0, 0);
     auto* tM7 = new ThreadedMatrix(s9, s10, new SquareMatrix(mid), mid, 0, 0);
 
+    // Threads to handle multiplication
     thread t1(BruteForceMultiplication, (void *)tM1);
     thread t2(BruteForceMultiplication, (void *)tM2);
     thread t3(BruteForceMultiplication, (void *)tM3);
@@ -449,7 +450,7 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     thread t5(BruteForceMultiplication, (void *)tM5);
     thread t6(BruteForceMultiplication, (void *)tM6);
     thread t7(BruteForceMultiplication, (void *)tM7);
-
+    // Join all threads
     t1.join();
     t2.join();
     t3.join();
@@ -475,6 +476,7 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     sub(*tempA, *M3, *tempB, mid);
     sub(*tempB, *M7, *C22, mid);
 
+    // Add sub-matrices data to resultant
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
             C->data[i][j]            = C11->data[i][j];

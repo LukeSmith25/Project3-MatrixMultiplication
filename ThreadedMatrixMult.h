@@ -200,14 +200,10 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
     t2.join();
     t3.join();
     t4.join();
-    BruteForceMultiplication((void*) tM1);
-    BruteForceMultiplication((void*) tM2);
-    BruteForceMultiplication((void*) tM3);
-    BruteForceMultiplication((void*) tM4);
-    BruteForceMultiplication((void*) tM5);
-    BruteForceMultiplication((void*) tM6);
-    BruteForceMultiplication((void*) tM7);
-    BruteForceMultiplication((void*) tM8);
+    t5.join();
+    t6.join();
+    t7.join();
+    t8.join();
 
     auto* C11 = new SquareMatrix(mid);
     auto* C12 = new SquareMatrix(mid);

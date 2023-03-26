@@ -33,9 +33,6 @@ int main() {
             matrixA->data[i][j] = input;
         }
     }
-    cout << "MatrixA: " << endl;
-    displayMatrix(matrixA);
-    cout << endl;
 
     // Read in Matrix B
     for (int i = 0; i < dim2; i++) {
@@ -44,9 +41,6 @@ int main() {
             matrixB->data[i][j] = input;
         }
     }
-    cout << "MatrixB: " << endl;
-    displayMatrix(matrixB);
-    cout << endl;
 
     // Test Brute Force
     cout << endl << "TESTING: BruteForce" << endl;

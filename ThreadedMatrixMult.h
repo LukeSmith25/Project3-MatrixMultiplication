@@ -3,9 +3,9 @@
 * Assignment Title:       Matrix Multiplication
 * Assignment Description: This program computes the product of two matrices using four methods: Brute Force, Divide
 *                         and Conquer, Strassen's Algorithm, and Threaded Strassen's Algorithm
-* Due Date:               2/19/2023
+* Due Date:               3/26/2023
 * Date Created:           3/3/2023
-* Date Last Modified:     3/3/2023 - Initial creation of files
+* Date Last Modified:     3/26/2023
  */
 
 #ifndef PROJECT3_MATRIXMULTIPLICATION_THREADEDMATRIXMULT_H
@@ -16,7 +16,7 @@
 #include <thread>
 using namespace std;
 
-
+// Struct Declarations
 struct SquareMatrix;
 struct ThreadedMatrix;
 
@@ -27,22 +27,22 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
 SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B);
 
 // Helper Functions
-void add(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, int mid);
-void sub(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, int mid);
+void multiply(const SquareMatrix& A, const SquareMatrix& B, SquareMatrix& C, int mid);
+void add(const SquareMatrix& A, const SquareMatrix& B, SquareMatrix& C, int mid);
+void sub(const SquareMatrix& A, const SquareMatrix& B, SquareMatrix& C, int mid);
 void displayMatrix(const SquareMatrix* m);
 
+// SquareMatrix Definition
 struct SquareMatrix{
     int dim;
-    int** data;    // points to a [dim x dim] square matrix
-    SquareMatrix(){
-
-    }
+    int** data;
+    SquareMatrix(){}
 
     /*
      * Function Name: SquareMatrix Constructor
      * Description:   Default constructor for SquareMatrix
      * Return:        Void
-     * Pre:           User enters Dimension for matrix
+     * Pre:           Integer representing the matrix's dimension is passed
      * Post:          SquareMatrix object is created and data is initialized to 0
      */
     SquareMatrix(int dim) {
@@ -58,7 +58,7 @@ struct SquareMatrix{
 };
 
 
-// Threads share the matrices
+// ThreadedMatrix Definition
 struct ThreadedMatrix {
     SquareMatrix *A;
     SquareMatrix *B;
@@ -69,7 +69,6 @@ struct ThreadedMatrix {
         this->A = a;
         this->B = b;
         this->C = c;
-        // Pass All Dimensions and Figure Out How to Divide in Functions
         this->dim = dim;
         this->rowStart = rowStart;
         this->colStart = colStart;
@@ -80,21 +79,15 @@ struct ThreadedMatrix {
  * Function Name: BruteForceMultiplication
  * Description:   Function uses brute force to multiply two matrices passed in
  * Return:        void *
- * Pre:           ThreadedMatrix struct exists
- * Post:          Pointer to memory is returned
+ * Pre:           ThreadedMatrix struct pointer passed to function and is cast to void *
+ * Post:          void ThreadedMatrix pointer is returned to thread
  */
 void* BruteForceMultiplication(void* tMatrix) {
-    ThreadedMatrix* threadedMatrix = (ThreadedMatrix*) tMatrix;
-    const SquareMatrix* A = threadedMatrix->A;
-    const SquareMatrix* B = threadedMatrix->B;
-
-    //cout << "threadedMatrixA" << endl;
-    //displayMatrix(A);
-    //cout << "threadedMatrixB" << endl;
-    //displayMatrix(B);
-
+    auto* threadedMatrix = (ThreadedMatrix*) tMatrix;
+    const auto* A = threadedMatrix->A;
+    const auto* B = threadedMatrix->B;
     int mid = threadedMatrix->A->dim;
-    // Iterate 0->mid and change multiplications accordingly
+
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
             int sum = 0;
@@ -111,30 +104,40 @@ void* BruteForceMultiplication(void* tMatrix) {
  * Function Name: BruteForce
  * Description:   Multiplies two matrices using brute force method
  * Return:        SquareMatrix Pointer
- * Pre:           Two SquareMatrix structs exists
- * Post:          C Matrix is returned
+ * Pre:           Two SquareMatrix structs are passed by reference
+ * Post:          Resultant matrix C is returned as a pointer
  */
 SquareMatrix* BruteForce(const SquareMatrix& A, const SquareMatrix& B) {
     auto* C = new SquareMatrix(A.dim);
-    // For Size of Row A
+    int mid = A.dim/2;
+
+    auto* A11 = new SquareMatrix(mid);
+    auto* A12 = new SquareMatrix(mid);
+    auto* A21 = new SquareMatrix(mid);
+    auto* A22 = new SquareMatrix(mid);
+
+    auto* B11 = new SquareMatrix(mid);
+    auto* B12 = new SquareMatrix(mid);
+    auto* B21 = new SquareMatrix(mid);
+    auto* B22 = new SquareMatrix(mid);
+
     for (int i = 0; i < A.dim; i++) {
-        // For Size of Col B
         for (int j = 0; j < B.dim; j++) {
-            // For Size of Col A (To Get Actual Values From A)
             for (int k = 0; k < A.dim; k++) {
                 C->data[i][j] += A.data[i][k] * B.data[k][j];
             }
         }
     }
+
     return C;
 }
 
 /*
  * Function Name: ThreadedDivideAndConquer
- * Description:   Function displays the dimension and the matrix's data
- * Return:        void
- * Pre:           SquareMatrix struct exists
- * Post:          Attributes of SquareMatrix are displayed
+ * Description:   Multiplies two matrices using brute force method and passes multiplications to individual threads
+ * Return:        SquareMatrix Pointer
+ * Pre:           Two SquareMatrix structs are passed by reference
+ * Post:          Resultant matrix C is returned as a pointer
  */
 SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix& B) {
     // Store dimension and Create Resultant
@@ -232,12 +235,11 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
  * Function Name: Strassen
  * Description:   Multiplies two matrices using Strassen's method
  * Return:        SquareMatrix Pointer
- * Pre:           Two SquareMatrix structs exists
- * Post:          C Matrix is returned
+ * Pre:           Two SquareMatrix structs are passed by reference
+ * Post:          Resultant matrix C is returned as a pointer
  */
 SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
-    SquareMatrix* C = new SquareMatrix(A.dim);
-
+    auto* C = new SquareMatrix(A.dim);
     int mid = A.dim/2;
 
     auto* A11 = new SquareMatrix(mid);
@@ -342,20 +344,16 @@ SquareMatrix* Strassen(const SquareMatrix& A, const SquareMatrix& B) {
             C->data[i + mid][j+ mid] = C22->data[i][j];
         }
     }
-    //cout << "A11, s1, M1" << endl;
-    //displayMatrix(A11);
-    //displayMatrix(s1);
-    //displayMatrix(M1);
 
     return C;
 }
 
 /*
  * Function Name: ThreadedStrassen
- * Description:   Multiplies two matrices using Threaded Strassen method
+ * Description:   Multiplies two matrices using Strassen's method and passes each multiplication to a separate thread
  * Return:        SquareMatrix Pointer
- * Pre:           Two SquareMatrix structs exists
- * Post:          C Matrix is returned
+ * Pre:           Two SquareMatrix structs are passed by reference
+ * Post:          Resultant matrix C is returned as a pointer
  */
 SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     auto* C = new SquareMatrix(A.dim);
@@ -489,7 +487,26 @@ SquareMatrix* ThreadedStrassen(const SquareMatrix& A, const SquareMatrix& B) {
     return C;
 }
 
-void add(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, int mid) {
+void multiply(const SquareMatrix& A, const SquareMatrix& B, SquareMatrix& C, int mid) {
+    for (int i = 0; i < mid; i++) {
+        for (int j = 0; j < mid; j++) {
+            int sum = 0;
+            for (int k = 0; k < C.dim; k++) {
+                sum += A.data[i][k] * B.data[k][j];
+            }
+            C.data[i][j] = sum;
+        }
+    }
+}
+
+/*
+ * Function Name: add
+ * Description:   Adds two matrices' data
+ * Return:        void
+ * Pre:           Three SquareMatrix structs are passed by reference and an integer is passed by value
+ * Post:          Resultant is stored in matrix C
+ */
+void add(const SquareMatrix& A, const SquareMatrix& B, SquareMatrix& C, int mid) {
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
             C.data[i][j] = A.data[i][j] + B.data[i][j];
@@ -497,7 +514,14 @@ void add(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, in
     }
 }
 
-void sub(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, int mid) {
+/*
+ * Function Name: sub
+ * Description:   Subtracts two matrices' data
+ * Return:        void
+ * Pre:           Three SquareMatrix structs are passed by reference and an integer is passed by value
+ * Post:          Resultant is stored in matrix C
+ */
+void sub(const SquareMatrix& A, const SquareMatrix& B, SquareMatrix& C, int mid) {
     for (int i = 0; i < mid; i++) {
         for (int j = 0; j < mid; j++) {
             C.data[i][j] = A.data[i][j] - B.data[i][j];
@@ -505,14 +529,12 @@ void sub(const SquareMatrix& A, const SquareMatrix& B, const SquareMatrix& C, in
     }
 }
 
-
-
 /*
  * Function Name: displayMatrix
  * Description:   Function displays the dimension and the matrix's data
  * Return:        void
- * Pre:           SquareMatrix struct exists
- * Post:          Attributes of SquareMatrix are displayed
+ * Pre:           SquareMatrix struct passed as pointer
+ * Post:          SquareMatrix dimension and data are displayed
  */
 void displayMatrix(const SquareMatrix* m) {
     cout << "Dimension: " << m->dim << endl;
@@ -523,9 +545,5 @@ void displayMatrix(const SquareMatrix* m) {
         cout << endl;
     }
 }
-
-
-
-
 
 #endif //PROJECT3_MATRIXMULTIPLICATION_THREADEDMATRIXMULT_H

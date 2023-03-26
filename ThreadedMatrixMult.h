@@ -186,18 +186,20 @@ SquareMatrix* ThreadedDivideAndConquer(const SquareMatrix& A, const SquareMatrix
     auto* tM8 = new ThreadedMatrix(A22, B22, new SquareMatrix(mid), dim, 0, 0);
 
     // Pass Matrices To Threads
-    /*
-    thread t1(BruteForceMultiplication, (void *)tC11);
-    thread t2(BruteForceMultiplication, (void *)tC12);
-    thread t3(BruteForceMultiplication, (void *)tC21);
-    thread t4(BruteForceMultiplication, (void *)tC22);
+    thread t1(BruteForceMultiplication, (void *)tM1);
+    thread t2(BruteForceMultiplication, (void *)tM2);
+    thread t3(BruteForceMultiplication, (void *)tM3);
+    thread t4(BruteForceMultiplication, (void *)tM4);
+    thread t5(BruteForceMultiplication, (void *)tM5);
+    thread t6(BruteForceMultiplication, (void *)tM6);
+    thread t7(BruteForceMultiplication, (void *)tM7);
+    thread t8(BruteForceMultiplication, (void *)tM8);
 
     // Join the Threads Results
     t1.join();
     t2.join();
     t3.join();
     t4.join();
-    */
     BruteForceMultiplication((void*) tM1);
     BruteForceMultiplication((void*) tM2);
     BruteForceMultiplication((void*) tM3);

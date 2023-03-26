@@ -34,6 +34,9 @@ void displayMatrix(const SquareMatrix* m);
 struct SquareMatrix{
     int dim;
     int** data;    // points to a [dim x dim] square matrix
+    SquareMatrix(){
+
+    }
 
     /*
      * Function Name: SquareMatrix Constructor
@@ -54,12 +57,13 @@ struct SquareMatrix{
     }
 };
 
+
 // Threads share the matrices
 struct ThreadedMatrix {
     SquareMatrix *A;
     SquareMatrix *B;
     SquareMatrix *C;
-    int dim, rowStart, rowEnd, colStart, colEnd;
+    int dim, rowStart, colStart;
 
     ThreadedMatrix(SquareMatrix *a, SquareMatrix *b, SquareMatrix *c, int dim, int rowStart, int colStart) {
         this->A = a;
@@ -100,8 +104,6 @@ void* BruteForceMultiplication(void* tMatrix) {
             threadedMatrix->C->data[i][j] = sum;
         }
     }
-    //cout << "threadedMatrixC" << endl;
-    //displayMatrix(threadedMatrix->C);
     return nullptr;
 }
 
